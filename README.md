@@ -1,4 +1,4 @@
-# Sketch-Flex-Layout
+# Sketch Flex Layout
 Lay out your Sketch files with CSS Flexbox right inside of Sketch.
 
 ![](http://i.imgur.com/aF6N2n7.png)
