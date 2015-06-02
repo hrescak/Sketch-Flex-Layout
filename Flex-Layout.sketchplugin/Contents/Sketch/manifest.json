@@ -1,0 +1,24 @@
+{
+  "name": "Sketch Flex Layout",
+  "description" : "CSS Flexbox layout inside of Sketch",
+  "author" : "Matej Hrescak",
+  "authorEmail" : "matej@hrescak.com",
+  "homepage": "https://github.com/hrescak/Sketch-Flex-Layout",
+  "version" : "1.0",
+  "identifier" : "com.hrescak.flexlayout",
+  "compatibleVersion": "3.3",
+  "bundleVersion": "1",
+  "commands" : [
+    {
+      "name" : "Compute Layout",
+      "script" : "Layout/layout.cocoascript",
+      "shortcut" : "cmd ctrl l",
+      "identifier" : "layoutElements"
+    },
+  ],
+  "menu" : {
+    "items" :[
+      "layoutElements"
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+// Layout
+// v0.5
+// =======================================
+// Apply CSS Layout to Sketch elements
+// Matej Hrescak (matejh@fb.com)
+
+@import 'layout.cssParser.js'
+@import 'layout.cssLayout.js'
+
+var styleSheetLayerName = "@stylesheet";
+var backgroundLayerName = "bg";
+
+var onRun = function (context) {
+  var parsedSheet = parseStyleSheetLayer(context);
+  saveStylesToLayers(parsedSheet, context);
+  var styleTree = styleTreeFromLayers(context);
+  var computedTree = computeStyles(styleTree, context);
+  layoutElements(computedTree, context);
+}
+
+var parseStyleSheetLayer = function(context) {
+  var styleSheetLayer = getStyleSheetLayer(context, styleSheetLayerName);
+  var cssString = "" + [styleSheetLayer stringValue] //hack to circumvent cocoa string;
+  var parsedCSS = parseCss(cssString, context);
+  return (parsedCSS);
+}
+
+var getStyleSheetLayer = function(context,layerName){
+  var layer = nil;
+  var doc = context.document;
+  var page = [doc currentPage];
+
+  var pageLayers = [page layers].array();
+  if (pageLayers) {
+    var loop = [pageLayers objectEnumerator];
+       while (item = [loop nextObject]) {
+         if ([item class] == "MSTextLayer" && [item name] == styleSheetLayerName)
+         layer = item;
+      }
+  }
+
+  if (!layer){
+    showError("No stylesheet found. Stylesheet has to be named \'" + styleSheetLayerName + "\'" );
+  }
+
+  return layer;
+}
+
+//utils
+
+var showError = function(message)
+{
+  showDialog("error", message);
+}
+
+var showDialog = function(title, message)
+{
+  var app = [NSApplication sharedApplication];
+  [app displayDialog:message withTitle:title];
+}
+
+onRun
