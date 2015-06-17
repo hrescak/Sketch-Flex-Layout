@@ -4,7 +4,9 @@
 // Apply CSS Layout to Sketch elements
 // Matej Hrescak (matejh@fb.com)
 
+@import 'layout.utils.js'
 @import 'layout.cssParser.js'
+@import 'layout.prototypeParser.js'
 @import 'layout.cssLayout.js'
 
 var styleSheetLayerName = "@stylesheet";
@@ -12,6 +14,11 @@ var backgroundLayerName = "bg";
 
 var onRun = function (context) {
   var parsedSheet = parseStyleSheetLayer(context);
+  log(parsedSheet);
+  var prototypeSheet = parsePrototypes(context);
+  log(prototypeSheet);
+  for(var attr in prototypeSheet){ parsedSheet[attr] = prototypeSheet[attr]};
+  
   saveStylesToLayers(parsedSheet, context);
   var styleTree = styleTreeFromLayers(context);
   var computedTree = computeStyles(styleTree, context);

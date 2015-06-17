@@ -67,7 +67,7 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
   }
   //ignore top page and stylesheet layer
   //todo - handle artboards and background layer
-  if (shouldLayoutChildren && [currentLayer class] != "MSPage" && currentLayer.name() != styleSheetLayerName) {
+  if (shouldLayoutChildren && !shouldIgnoreLayer(currentLayer)) {
 
     // 0 gets undefined when it's passed as a parameter *gosh*
     if (!currentY) { currentY = 0; };
@@ -181,21 +181,16 @@ var JSONizeStyleTree = function(styleTree, context, jsContext){
   return JSONizedString; // JSValue to pass along to the css-layout library;
 }
 
-
-// return whether a layer can have children
-var isGroupClassMember = function(layer)
-{
-  if ([layer class] == "MSArtboardGroup" || [layer class] == "MSLayerGroup" || [layer class] == "MSPage"]) {
+// check whether a layer should be ignored when laid out
+var shouldIgnoreLayer = function(currentLayer){
+  if ([currentLayer class] == "MSPage") {
+    return true;
+  }
+  if (currentLayer.name() == styleSheetLayerName) {
+    return true;
+  }
+  if ([[currentLayer name] hasPrefix:"@"]) {
     return true;
   }
   return false;
-}
-
-// returns whether a string ends with a suffix
-var endsWithString = function(str, suffix){
-
-  // var lastIndex = str.lastIndexOf(suffix);
-  // return (lastIndex !== -1) && (lastIndex + suffix.length === str.length);
-  //return str.indexOf(suffix, str.length - suffix.length) !== -1;
-  return [str hasSuffix:suffix];
 }
