@@ -1,5 +1,6 @@
 var prototypeKeyword = "prototype";
 var styleHandle = "@";
+var styleLayerName = "styles";
 var compoundProperties = ["margin", "padding", "size"];
 var widthProperties = ["width", "minWidth", "maxWidth", "left", "right", "marginLeft", "marginRight", "paddingLeft", "paddingRight"];
 var heightProperties = ["height", "minHeight", "maxHeight", "top", "bottom", "marginTop", "marginBottom", "paddintTop", "paddingBottom"];
@@ -61,6 +62,14 @@ var collectAttributes = function(layer){
   for (var i = 0; i < [childLayers count]; i++) {
     var styleLayer = childLayers[i];
 
+    //collect style layer
+    if ([styleLayer name] == styleHandle + styleLayerName) {
+      var styleLayerAttributes = attributesFromStyleLayer(styleLayer);
+      for (var attr in styleLayerAttributes) {
+        attributes[attr] = styleLayerAttributes[attr];
+      }
+    }
+
     //collect compounds;
     for (var j = 0; j < compoundProperties.length; j++) {
       if ([styleLayer name] == styleHandle + compoundProperties[j]) {
@@ -97,5 +106,29 @@ var collectAttributes = function(layer){
       }
     }
   }
+  return attributes;
+}
+
+var attributesFromStyleLayer = function(layer){
+  var attributes = {};
+  if (isTextLayer(layer)) {
+    var attributeString = [layer stringValue];
+    //strip whitespace and newlines
+    attributeString = [attributeString stringByReplacingOccurrencesOfString:"\n" withString:""];
+    attributeString = [attributeString stringByReplacingOccurrencesOfString:" " withString:""];
+
+    var attributesArray = [attributeString componentsSeparatedByString:";"];
+    log([attributesArray count])
+    for (var i = 0; i < [attributesArray count]; i++) {
+      var currentAttribute = attributesArray[i];
+      var splitAttribute = [currentAttribute componentsSeparatedByString:":"];
+      if ([splitAttribute count] == 2) {
+        var property = splitAttribute[0];
+        var propertyValue = splitAttribute[1];
+        attributes[property] = propertyValue;
+      }
+    }
+  }
+  log(attributes);
   return attributes;
 }

@@ -14,11 +14,9 @@ var backgroundLayerName = "bg";
 
 var onRun = function (context) {
   var parsedSheet = parseStyleSheetLayer(context);
-  log(parsedSheet);
   var prototypeSheet = parsePrototypes(context);
-  log(prototypeSheet);
   for(var attr in prototypeSheet){ parsedSheet[attr] = prototypeSheet[attr]};
-  
+  log(parsedSheet);
   saveStylesToLayers(parsedSheet, context);
   var styleTree = styleTreeFromLayers(context);
   var computedTree = computeStyles(styleTree, context);

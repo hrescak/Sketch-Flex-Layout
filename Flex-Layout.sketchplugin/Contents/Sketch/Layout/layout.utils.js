@@ -7,6 +7,10 @@ var isGroupClassMember = function(layer)
   return false;
 }
 
+var isTextLayer = function(layer){
+  return ([layer class] == "MSTextLayer");
+}
+
 // returns whether a string ends with a suffix
 var endsWithString = function(str, suffix){
 

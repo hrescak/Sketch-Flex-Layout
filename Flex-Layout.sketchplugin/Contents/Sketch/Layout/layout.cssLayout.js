@@ -78,17 +78,12 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
 
     [[currentLayer frame] setY:relativeY];
     [[currentLayer frame] setX:relativeX];
-    [[currentLayer frame] setWidth: layerTree["width"]];
-    [[currentLayer frame] setHeight: layerTree["height"]];
-  }
 
-  // special case for group background to stretch to parent group size
-  if (currentLayer.name() == backgroundLayerName) {
-    var parentLayer = [currentLayer parentGroup];
-    [[currentLayer frame] setY:0];
-    [[currentLayer frame] setX:0];
-    [[currentLayer frame] setWidth:parentLayer.frame().width()];
-    [[currentLayer frame] setHeight:parentLayer.frame().height()];
+    // don't set size on groups, it resizes based on children and would fuck things up
+    if (!isGroupClassMember(currentLayer)) {
+      [[currentLayer frame] setWidth: layerTree["width"]];
+      [[currentLayer frame] setHeight: layerTree["height"]];
+    }
   }
 
   // iterate over children recursively if we can
@@ -99,8 +94,17 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
     var parentY = currentLayer.frame.y;
     if (childLayers){
       for (var i=0; i < [childLayers count]; i++){
-        var item = childLayers[i];
-        layoutLayersRecursively(childStyleTree[i], parentX, parentY, item, shouldLayoutChildren, layerStore);
+        var childLayer = childLayers[i];
+
+        // special case for group background to stretch to parent group size
+        if (childLayer.name() == backgroundLayerName) {
+          [[childLayer frame] setY:0];
+          [[childLayer frame] setX:0];
+          [[childLayer frame] setWidth:layerTree["width"]];
+          [[childLayer frame] setHeight:layerTree["height"]];
+        }
+
+        layoutLayersRecursively(childStyleTree[i], parentX, parentY, childLayer, shouldLayoutChildren, layerStore);
       }
     }
   }
@@ -111,9 +115,9 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
 
 // takes a selector, traverses the layer to see if there's one with that name
 // and saves a corresponding style to the layer metadata
-// todo - substring matches layers if classes are substrings of other classes
 var saveAStyleToLayersRecursively = function(selector, style, layer, context){
   var sketchCommand = context.command;
+  //[sketchCommand setValue:nil forKey:"style" onLayer:layer];
 
   //save styles to layers with classes, ignore stylesheet layer and the parent page
   //for the future - ignore prototype layers maybe?
@@ -143,6 +147,13 @@ var stylesForAllLayers = function(layer, context){
     var sketchCommand = context.command;
     var layerStyle = [sketchCommand valueForKey:"style" onLayer:layer];
     if (layerStyle) {
+      layerInfo["style"] = layerStyle;
+    }
+
+    //add position absolute to style layers and backgrounds so their sizes are not computed
+    if ([[layer name] hasPrefix:"@"] || [layer name] == backgroundLayerName){
+      layerStyle = {};
+      layerStyle["position"] = "absolute";
       layerInfo["style"] = layerStyle;
     }
   }
@@ -187,6 +198,9 @@ var shouldIgnoreLayer = function(currentLayer){
     return true;
   }
   if (currentLayer.name() == styleSheetLayerName) {
+    return true;
+  }
+  if (currentLayer.name() == backgroundLayerName) {
     return true;
   }
   if ([[currentLayer name] hasPrefix:"@"]) {
