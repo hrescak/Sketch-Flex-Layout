@@ -21,23 +21,21 @@ var computeStyles = function(styleTree, context){
   var jsContext = [[JSContext alloc] init];
   var layoutLib = getLibraryContents("lib/css-layout/Layout.js", context);
   [jsContext evaluateScript:layoutLib];
-  var fillNodes = jsContext[@"computeLayout"][@"fillNodes"];
-  var computeLayout = jsContext[@"computeLayout"][@"computeLayout"];
-  var extractNodes = jsContext[@"computeLayout"][@"extractNodes"];
+  var layoutHelper = getLibraryContents("layout.JSLayoutHelper.js", context);
+  [jsContext evaluateScript:layoutHelper];
+  var computeLayout = jsContext[@"provideComputedLayout"];
+  // jsContext[@"someFunction"] = function(input){
+  //   log("BOOOM" + input);
+  // }
 
   log("style tree:");
   log(styleTree);
-  //jsonized the layer tree
-  var JSONizedString = JSONizeStyleTree(styleTree, context, jsContext);
-
-  log("jsonizedstring:");
-  log([JSONizedString toDictionary]);
+  //stringify the layer tree
+  var stringifiedStyles = stringifyStyleTree(styleTree);
 
   //compute styles
-  var layoutArguments = NSArray.arrayWithObjects(JSONizedString);
-  [fillNodes callWithArguments:layoutArguments];
-  [computeLayout callWithArguments:layoutArguments];
-  var computedStyles = [extractNodes callWithArguments:layoutArguments];
+  var layoutArguments = NSArray.arrayWithObjects(stringifiedStyles);
+  var computedStyles = [computeLayout callWithArguments:layoutArguments];
 
   //in case something goes to hell - todo - throw an alert if not empty
   log("exception:");
@@ -144,6 +142,11 @@ var stylesForAllLayers = function(layer, context){
   var layerInfo = {};
   if (layer.name() != styleSheetLayerName){
     layerInfo["name"] = layer.name(); //todo - find a way to represent layer better (uuid that gets stored maybe?)
+    if (isTextLayer(layer)) {
+      layerInfo["textContent"] = layer.stringValue();
+      layerInfo["textSize"] = layer.fontSize();
+      layerInfo["textFont"] = layer.fontPostscriptName();
+    }
     var sketchCommand = context.command;
     var layerStyle = [sketchCommand valueForKey:"style" onLayer:layer];
     if (layerStyle) {
@@ -176,20 +179,12 @@ var stylesForAllLayers = function(layer, context){
 }
 
 // takes an obj-c dictionary of all layers, together with styles
-// returns JSValue with correct JSON where all numerical values are numbers
-var JSONizeStyleTree = function(styleTree, context, jsContext){
+// returns string to pass along to layout helper
+var stringifyStyleTree = function(styleTree, context){
   // first converst the tree to stringified JSON
   var JSONData = [NSJSONSerialization dataWithJSONObject:styleTree options:0 error:nil];
   var JSONString = [[NSString alloc] initWithData:JSONData encoding:NSUTF8StringEncoding];
-  var JSONArguments = NSArray.arrayWithObject(JSONString);
-
-  // then parse the JSON in a new JScontext
-  var JSONParser = getLibraryContents("layout.JSONLayoutParser.js", context);
-  [jsContext evaluateScript:JSONParser];
-  var JSONParseFunction = jsContext[@"parseLayoutToJSON"];
-  var JSONizedString = [JSONParseFunction callWithArguments:JSONArguments];
-
-  return JSONizedString; // JSValue to pass along to the css-layout library;
+  return JSONString; // JSValue to pass along to the css-layout library;
 }
 
 // check whether a layer should be ignored when laid out
