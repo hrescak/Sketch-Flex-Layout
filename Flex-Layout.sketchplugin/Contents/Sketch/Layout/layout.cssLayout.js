@@ -1,3 +1,5 @@
+
+
 // save stylesheet to layer metadata
 var saveStylesToLayers = function(styles,context){
   var doc = context.document;
@@ -13,6 +15,15 @@ var styleTreeFromLayers = function(context){
   var page = [doc currentPage];
   var styleTree = stylesForAllLayers(page,context);
   return styleTree;
+}
+
+//collect all the measures from layers
+var collectMeasures = function(styleTree, computedStyleTree, context){
+  var doc = context.document;
+  var page = [doc currentPage];
+  var layerStore = context.command;
+  var measuredStyleTree = collectMeasuresRecursively(page, styleTree, computedStyleTree, false, layerStore);
+  return measuredStyleTree;
 }
 
 // compute layout given the metadata style tree
@@ -109,6 +120,33 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
 
 }
 
+var collectMeasuresRecursively = function(currentLayer, styleTree, computedStyleTree, shouldCollectMeasures, layerStore){
+  // only collect measures if it's a descendant of a styled element
+  if ([layerStore valueForKey:"style" onLayer:currentLayer]) {
+    shouldCollectMeasures = true;
+  }
+  //collect measures if it's a text layer
+  if (shouldCollectMeasures && isTextLayer(currentLayer)) {
+    [[currentLayer frame] setWidth:computedStyleTree["width"]];
+    [currentLayer adjustFrameToFit];
+    styleTree["computedHeight"] = currentLayer.frame().height();
+  }
+
+  // iterate over children recursively if we can
+  if (isGroupClassMember(currentLayer)){
+    var childLayers = [currentLayer layers].array();
+    var childStyleTree = styleTree["children"];
+    var childComputedTree = computedStyleTree["children"];
+    if (childLayers){
+      for (var i=0; i < [childLayers count]; i++){
+        var childLayer = childLayers[i];
+        styleTree["children"][i] = collectMeasuresRecursively(childLayer, childStyleTree[i], childComputedTree[i], shouldCollectMeasures, layerStore);
+      }
+    }
+  }
+  return styleTree;
+}
+
 // ----------------- helpers ---------------- //
 
 // takes a selector, traverses the layer to see if there's one with that name
@@ -142,11 +180,6 @@ var stylesForAllLayers = function(layer, context){
   var layerInfo = {};
   if (layer.name() != styleSheetLayerName){
     layerInfo["name"] = layer.name(); //todo - find a way to represent layer better (uuid that gets stored maybe?)
-    if (isTextLayer(layer)) {
-      layerInfo["textContent"] = layer.stringValue();
-      layerInfo["textSize"] = layer.fontSize();
-      layerInfo["textFont"] = layer.fontPostscriptName();
-    }
     var sketchCommand = context.command;
     var layerStyle = [sketchCommand valueForKey:"style" onLayer:layer];
     if (layerStyle) {

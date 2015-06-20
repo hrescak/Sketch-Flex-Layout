@@ -20,6 +20,8 @@ var onRun = function (context) {
   saveStylesToLayers(parsedSheet, context);
   var styleTree = styleTreeFromLayers(context);
   var computedTree = computeStyles(styleTree, context);
+  var measuredStyleTree = collectMeasures(styleTree, computedTree, context);
+  computedTree = computeStyles(measuredStyleTree, context);
   layoutElements(computedTree, context);
 }
 

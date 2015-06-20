@@ -29,12 +29,12 @@ var provideComputedLayout = function(styleTree){
 
 var insertMeasures = function(rootNode){
 
-  if (rootNode.hasOwnProperty("textContent")) {
+  if (rootNode.hasOwnProperty("computedHeight")) {
     if (!rootNode.hasOwnProperty("style")) {
       rootNode.style = {};
     };
     rootNode.style.measure = function(width){
-      return measureText(rootNode["textContent"], rootNode["fontSize"], rootNode["fontName"], width);
+      return {width:width, height:rootNode.computedHeight};
     };
   };
 
@@ -64,7 +64,3 @@ var numericReviver = function(key, value){
   }
   return returnValue ;
 }
-
-var measureText = function(text, fontSize, fontName, width){
-  return {width:width, height:40};
-};
