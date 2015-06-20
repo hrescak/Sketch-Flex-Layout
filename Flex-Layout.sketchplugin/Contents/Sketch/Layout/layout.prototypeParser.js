@@ -5,26 +5,25 @@ var compoundProperties = ["margin", "padding", "size"];
 var widthProperties = ["width", "minWidth", "maxWidth", "left", "right", "marginLeft", "marginRight", "paddingLeft", "paddingRight"];
 var heightProperties = ["height", "minHeight", "maxHeight", "top", "bottom", "marginTop", "marginBottom", "paddintTop", "paddingBottom"];
 
-var parsePrototypes = function(context){
-  var doc = context.document;
-  var page = [doc currentPage];
-  log("parsing prototypes");
+// parse all the prototypes on the current page
+var parsePrototypes = function(){
   // look for prototypes in page recursively
   var styleArray = parseLayersForPrototypes(page,false);
   var flattenedArray = flattenArray(styleArray);
+  log(flattenedArray.length + " classes found in prototypes");
   var styleObject = keyedObjectFromArray(flattenedArray, "class");
   return styleObject;
 }
 
+// recursively look for prototypes and collect styles in an array
 var parseLayersForPrototypes = function(baseLayer,shouldCollectStyles){
   //if layer is a prototype, flip a switch to parse all of the children for styles
   var parsedStyles = [];
   if (isLayerAPrototype(baseLayer)) {
     shouldCollectStyles = true;
   }
-
+  // you can only collect styles on groups
   if (isGroupClassMember(baseLayer)){
-    // you can only collect styles on groups
     if (shouldCollectStyles) {
       var styleAttributes = collectAttributes(baseLayer);
       if (objectSize(styleAttributes) > 0) {
@@ -32,6 +31,8 @@ var parseLayersForPrototypes = function(baseLayer,shouldCollectStyles){
         styleObject["class"] = layerClass(baseLayer);
         styleObject["attributes"] = styleAttributes;
         parsedStyles.push(styleObject);
+      } else {
+        showMessage(baseLayer.name() + " has no styles attached");
       }
     }
     var childLayers = [baseLayer layers].array();
@@ -54,7 +55,6 @@ var isLayerAPrototype = function(layer){
 // collects all attributes from style layers
 var collectAttributes = function(layer){
   var attributes = {};
-  log("collecting layer styles on" + [layer name]);
 
   // iterate over child layers to look for style layers
   var childLayers = [layer layers].array();
@@ -118,7 +118,6 @@ var attributesFromStyleLayer = function(layer){
     attributeString = [attributeString stringByReplacingOccurrencesOfString:" " withString:""];
 
     var attributesArray = [attributeString componentsSeparatedByString:";"];
-    log([attributesArray count])
     for (var i = 0; i < [attributesArray count]; i++) {
       var currentAttribute = attributesArray[i];
       var splitAttribute = [currentAttribute componentsSeparatedByString:":"];
@@ -129,6 +128,5 @@ var attributesFromStyleLayer = function(layer){
       }
     }
   }
-  log(attributes);
   return attributes;
 }

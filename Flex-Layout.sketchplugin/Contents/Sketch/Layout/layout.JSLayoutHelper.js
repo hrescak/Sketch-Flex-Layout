@@ -16,19 +16,17 @@ var numericProperties = [
 ];
 
 var provideComputedLayout = function(styleTree){
-  // someFunction("yoo");
-  var parsedLayout = parseLayoutToJSON(styleTree);
-
-  parsedLayout = insertMeasures(parsedLayout);
+  var parsedTree = parseLayoutToJSON(styleTree);
+  parsedTree = insertMeasures(parsedTree);
   // feed the style tree to the css-layout
-  computeLayout.fillNodes(parsedLayout);
-  computeLayout.computeLayout(parsedLayout);
-  var computedStyles = computeLayout.extractNodes(parsedLayout);
+  computeLayout.fillNodes(parsedTree);
+  computeLayout.computeLayout(parsedTree);
+  var computedStyles = computeLayout.extractNodes(parsedTree);
   return computedStyles;
 }
 
+// insert measure functions into the node tree based on collected measures
 var insertMeasures = function(rootNode){
-
   if (rootNode.hasOwnProperty("computedHeight")) {
     if (!rootNode.hasOwnProperty("style")) {
       rootNode.style = {};

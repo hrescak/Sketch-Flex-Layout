@@ -1,3 +1,19 @@
+// global sketch variables setup and init
+var app = [NSApplication sharedApplication],
+  doc, page, plugin, pluginPath, pluginURL, pluginCommand, selection, artboard;
+
+function init(context) {
+  doc = context.document;
+  page = doc.currentPage();
+  pages = [doc pages];
+  selection = context.selection;
+  artboard = [[doc currentPage] currentArtboard];
+  plugin = context.plugin;
+  pluginPath = [plugin url] + "";
+  pluginURL = context.scriptURL;
+  pluginCommand = context.command;
+}
+
 // return whether a layer can have children
 var isGroupClassMember = function(layer)
 {
@@ -7,16 +23,13 @@ var isGroupClassMember = function(layer)
   return false;
 }
 
+// returns whether a layer is a text layer
 var isTextLayer = function(layer){
   return ([layer class] == "MSTextLayer");
 }
 
 // returns whether a string ends with a suffix
 var endsWithString = function(str, suffix){
-
-  // var lastIndex = str.lastIndexOf(suffix);
-  // return (lastIndex !== -1) && (lastIndex + suffix.length === str.length);
-  //return str.indexOf(suffix, str.length - suffix.length) !== -1;
   return [str hasSuffix:suffix];
 }
 
@@ -56,4 +69,28 @@ var keyedObjectFromArray = function(array, key){
     keyedObject[arrayKey] = arrayMember;
   }
   return keyedObject;
+}
+
+// return a string context of an external file, useful for loading libraries
+// and node.js modules into a JavscriptCore context
+var getLibraryContents = function(path, context) {
+  var scriptFolder = [pluginURL URLByDeletingLastPathComponent];
+  var libraryURL = [scriptFolder URLByAppendingPathComponent:path];
+  var fileString = NSString.stringWithContentsOfFile(libraryURL);
+  return fileString;
+}
+
+// ------------ UI --------- //
+
+var showMessage = function(message){
+  [doc showMessage:message];
+}
+
+var showError = function(message){
+  showDialog("error", message);
+}
+
+var showDialog = function(title, message){
+  var app = [NSApplication sharedApplication];
+  [app displayDialog:message withTitle:title];
 }

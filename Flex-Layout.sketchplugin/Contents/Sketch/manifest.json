@@ -11,7 +11,7 @@
   "commands" : [
     {
       "name" : "Compute Layout",
-      "script" : "Layout/layout.cocoascript",
+      "script" : "Layout/layout.js",
       "shortcut" : "cmd ctrl l",
       "identifier" : "layoutElements"
     },

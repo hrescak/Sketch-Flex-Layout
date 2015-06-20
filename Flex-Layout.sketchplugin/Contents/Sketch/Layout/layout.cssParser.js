@@ -1,22 +1,39 @@
+// returns parsed CSS retrieved from style sheet layer
+var parseStyleSheetLayer = function() {
+  var parsedCSS = {}
+  var styleSheetLayer = getStyleSheetLayer(styleSheetLayerName);
+  if (styleSheetLayer) {
+    var cssString = "" + [styleSheetLayer stringValue]; //hack to circumvent cocoa string;
+    var parsedCSS = parseCss(cssString);
+  } else {
+    log("No stylesheet found, proceeding to prototypes");
+  }
+  return (parsedCSS);
+}
+
+// get the styleSheet layer
+var getStyleSheetLayer = function(layerName){
+  var layer = nil;
+  var pageLayers = [page layers].array();
+  if (pageLayers) {
+    var loop = [pageLayers objectEnumerator];
+       while (item = [loop nextObject]) {
+         if ([item class] == "MSTextLayer" && [item name] == styleSheetLayerName)
+         layer = item;
+      }
+  }
+  return layer;
+}
+
 // takes a CSS string and returns a json with all the rules
-var parseCss = function(cssToParse, context) {
+var parseCss = function(cssToParse) {
   var jsContext = [[JSContext alloc] init];
-  var json = getLibraryContents("lib/CSSJSON/json2.js", context);
-  [jsContext evaluateScript:json];
-  var parser = getLibraryContents("lib/CSSJSON/cssjson.js", context);
+  var jsonLib = getLibraryContents("lib/CSSJSON/json2.js");
+  [jsContext evaluateScript:jsonLib];
+  var parser = getLibraryContents("lib/CSSJSON/cssjson.js");
   [jsContext evaluateScript:parser];
   var parseScript = jsContext[@"CSSJSON"][@"toJSON"];
   var parseArguments = NSArray.arrayWithObjects(cssToParse);
   var parsedCSS = [parseScript callWithArguments:parseArguments];
   return [parsedCSS toDictionary].children;
-}
-
-// return a string context of an external file, useful for loading libraries
-// and node.js modules into a JavscriptCore context
-var getLibraryContents = function(path, context) {
-  var scriptURL = context.scriptURL;
-  var scriptFolder = [scriptURL URLByDeletingLastPathComponent];
-  var libraryURL = [scriptFolder URLByAppendingPathComponent:path];
-  var fileString = NSString.stringWithContentsOfFile(libraryURL);
-  return fileString;
 }
