@@ -32,6 +32,9 @@ var insertMeasures = function(rootNode){
       rootNode.style = {};
     };
     rootNode.style.measure = function(width){
+      if (rootNode.hasOwnProperty("computedWidth")) {
+        width = rootNode.computedWidth;
+      }
       return {width:width, height:rootNode.computedHeight};
     };
   };

@@ -70,13 +70,17 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
     var relativeY = currentY + layerTree["top"];
     var relativeX = currentX + layerTree["left"];
 
-    [[currentLayer frame] setY:relativeY];
-    [[currentLayer frame] setX:relativeX];
+    var positionRect = currentLayer.rect();
+    positionRect.origin.x = relativeX;
+    positionRect.origin.y = relativeY;
+    currentLayer.setRect(positionRect);
 
     // don't set size on groups, it resizes based on children and would fuck things up
     if (!isGroupClassMember(currentLayer)) {
-      [[currentLayer frame] setWidth: layerTree["width"]];
-      [[currentLayer frame] setHeight: layerTree["height"]];
+      var sizeRect = [currentLayer rect];
+      sizeRect.size.width = layerTree["width"];
+      sizeRect.size.height = layerTree["height"];
+      [currentLayer setRect:sizeRect];
     }
   }
 
@@ -92,10 +96,12 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
 
         // special case for group background to stretch to parent group size
         if (childLayer.name() == backgroundLayerName) {
-          [[childLayer frame] setY:0];
-          [[childLayer frame] setX:0];
-          [[childLayer frame] setWidth:layerTree["width"]];
-          [[childLayer frame] setHeight:layerTree["height"]];
+          var childRect = [childLayer rect];
+          childRect.origin.y = 0;
+          childRect.origin.x = 0;
+          childRect.size.width = layerTree["width"];
+          childRect.size.height = layerTree["height"];
+          [childLayer setRect:childRect];
         }
         layoutLayersRecursively(childStyleTree[i], parentX, parentY, childLayer, shouldLayoutChildren);
       }
@@ -113,9 +119,19 @@ var collectMeasuresRecursively = function(currentLayer, styleTree, computedStyle
   }
   //collect measures if it's a text layer
   if (shouldCollectMeasures && isTextLayer(currentLayer)) {
-    [[currentLayer frame] setWidth:computedStyleTree["width"]];
-    [currentLayer adjustFrameToFit];
-    styleTree["computedHeight"] = currentLayer.frame().height();
+    // parent elements have width and text should behave appropriately
+    if (computedStyleTree["width"] > 0) {
+      [currentLayer setTextBehaviour:1] // BCTextBehaviourFixedWidth
+      var currentRect = [currentLayer rect];
+      currentRect.size.width = computedStyleTree["width"];
+      [currentLayer setRect:currentRect];
+      [currentLayer adjustFrameToFit];
+    // parent elements have no width, they should behave according to the text layer
+    } else {
+      styleTree["computedWidth"] = currentLayer.rect().size.width;
+    }
+
+    styleTree["computedHeight"] = currentLayer.rect().size.height;
   }
 
   // iterate over children recursively if we can
@@ -161,6 +177,8 @@ var saveAStyleToLayersRecursively = function(selector, style, layer){
 
 var flushLayerStylesRecursively = function(layer){
   [pluginCommand setValue:nil forKey:"style" onLayer:layer];
+  [pluginCommand setValue:nil forKey:"computedWidth" onLayer:layer];
+  [pluginCommand setValue:nil forKey:"computedHeight" onLayer:layer];
 
   // iterate over children recursively if we can
   if (isGroupClassMember(layer)){

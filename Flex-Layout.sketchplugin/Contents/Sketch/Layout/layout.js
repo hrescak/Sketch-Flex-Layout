@@ -25,6 +25,8 @@ var onRun = function(context) {
   var computedTree = computeStyles(styleTree);
   log("computed layout tree:" + computedTree);
   var measuredStyleTree = collectMeasures(styleTree, computedTree);
+  log("measured style tree:");
+  log(measuredStyleTree);
   computedTree = computeStyles(measuredStyleTree);
   log("recomputed measured layout tree:" + computedTree);
   layoutElements(computedTree);

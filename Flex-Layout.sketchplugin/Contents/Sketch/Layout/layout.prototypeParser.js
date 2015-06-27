@@ -3,7 +3,7 @@ var styleHandle = "@";
 var styleLayerName = "styles";
 var compoundProperties = ["margin", "padding", "size"];
 var widthProperties = ["width", "minWidth", "maxWidth", "left", "right", "marginLeft", "marginRight", "paddingLeft", "paddingRight"];
-var heightProperties = ["height", "minHeight", "maxHeight", "top", "bottom", "marginTop", "marginBottom", "paddintTop", "paddingBottom"];
+var heightProperties = ["height", "minHeight", "maxHeight", "top", "bottom", "marginTop", "marginBottom", "paddingTop", "paddingBottom"];
 
 // parse all the prototypes on the current page
 var parsePrototypes = function(){
