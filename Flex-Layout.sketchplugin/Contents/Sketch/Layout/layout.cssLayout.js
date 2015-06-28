@@ -47,6 +47,7 @@ var computeStyles = function(styleTree){
 // lay out all the layers given computed styles
 var layoutElements = function(computedTree){
   layoutLayersRecursively(computedTree, 0,0, page, false);
+  doc.currentView().refresh();
 }
 
 // traverse all of the layers and lay out the elements
@@ -105,6 +106,8 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
         }
         layoutLayersRecursively(childStyleTree[i], parentX, parentY, childLayer, shouldLayoutChildren);
       }
+      // make sure group's bounds are re-set
+      [currentLayer resizeRoot:true];
     }
   }
 }
