@@ -1,5 +1,5 @@
 # Sketch Flex Layout
-A Plugin for Sketch allowing for CSS Flexbox layouts using stylesheets and prototypes. To install the plugin download the plugin file and double click the Flex-Layout.sketchplugin file. **Important note :** *This is a very work in progress version for early testing. A lot of things are subject to change and using it on critical projects is not yet recommended.*
+A Plugin for Sketch allowing for CSS Flexbox layouts using stylesheets and prototypes. To install the plugin download this repository as a ZIP and double click the Flex-Layout.sketchplugin file. **Important note :** *This is a very work in progress version for early testing. A lot of things are subject to change and using it on critical projects is not yet recommended.*
 
 ![](http://i.imgur.com/Z5A8Hqo.png)
 
