@@ -14,6 +14,19 @@ function init(context) {
   pluginCommand = context.command;
 }
 
+// call a function on all layers
+var callOnChildLayers = function(layer, callback){
+  callback(layer);
+  if (isGroupClassMember(layer)) {
+    var childLayers = [layer layers].array();
+    if (childLayers) {
+      for (var i = 0; i < childLayers.count(); i++) {
+        callOnChildLayers(childLayers[i], callback);
+      }
+    }
+  }
+}
+
 // return whether a layer can have children
 var isGroupClassMember = function(layer)
 {

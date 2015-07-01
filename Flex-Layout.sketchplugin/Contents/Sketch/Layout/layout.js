@@ -6,7 +6,7 @@
 
 @import 'layout.utils.js'
 @import 'layout.cssParser.js'
-@import 'layout.prototypeParser.js'
+@import 'layout.prototypes.js'
 @import 'layout.cssLayout.js'
 
 var styleSheetLayerName = "@stylesheet";
@@ -30,4 +30,5 @@ var onRun = function(context) {
   computedTree = computeStyles(measuredStyleTree);
   log("recomputed measured layout tree:" + computedTree);
   layoutElements(computedTree);
+  layoutPrototypes();
 }

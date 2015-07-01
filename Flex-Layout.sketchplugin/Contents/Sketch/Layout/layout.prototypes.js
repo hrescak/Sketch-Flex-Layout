@@ -15,6 +15,17 @@ var parsePrototypes = function(){
   return styleObject;
 }
 
+// lays out prototype styles
+var layoutPrototypes  = function(){
+    callOnChildLayers(page, function(layer){
+      if (isLayerAPrototype(layer)) {
+        callOnChildLayers(layer, function(currentLayer){
+          layoutPrototypeStyles(currentLayer);
+        })
+      };
+    });
+}
+
 // recursively look for prototypes and collect styles in an array
 var parseLayersForPrototypes = function(baseLayer,shouldCollectStyles){
   //if layer is a prototype, flip a switch to parse all of the children for styles
@@ -109,6 +120,7 @@ var collectAttributes = function(layer){
   return attributes;
 }
 
+//collects attribute from the styles text layer
 var attributesFromStyleLayer = function(layer){
   var attributes = {};
   if (isTextLayer(layer)) {
@@ -129,4 +141,9 @@ var attributesFromStyleLayer = function(layer){
     }
   }
   return attributes;
+}
+
+// lays out and colors all the prototype style layers
+var layoutPrototypeStyles = function(layer){
+  log("laying out " + layer.name());
 }
