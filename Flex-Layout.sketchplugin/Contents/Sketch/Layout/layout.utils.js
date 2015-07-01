@@ -27,6 +27,15 @@ var callOnChildLayers = function(layer, callback){
   }
 }
 
+// moves provided layer into the current selection
+var moveLayerToSelection = function(layer){
+  var selectedLayer = selection[0];
+  if (isGroupClassMember(selectedLayer)) {
+    [layer removeFromParent];
+    [selectedLayer addLayers:[layer]];
+  }
+}
+
 // return whether a layer can have children
 var isGroupClassMember = function(layer)
 {
@@ -84,6 +93,15 @@ var keyedObjectFromArray = function(array, key){
   return keyedObject;
 }
 
+// given an object where children ha
+var arrayOfValuesByKey = function(arr, key){
+  var returnArray = [];
+  for (var i = 0; i < arr.length; i++) {
+    returnArray.push(arr[i][key]);
+  }
+  return returnArray;
+}
+
 // return a string context of an external file, useful for loading libraries
 // and node.js modules into a JavscriptCore context
 var getLibraryContents = function(path, context) {
@@ -106,4 +124,23 @@ var showError = function(message){
 var showDialog = function(title, message){
   var app = [NSApplication sharedApplication];
   [app displayDialog:message withTitle:title];
+}
+
+var createSelect = function(msg, items, selectedItemIndex){
+  selectedItemIndex = selectedItemIndex || 0
+
+  var accessory = [[NSComboBox alloc] initWithFrame:NSMakeRect(0,0,200,25)]
+  [accessory addItemsWithObjectValues:items]
+  [accessory selectItemAtIndex:selectedItemIndex]
+
+  var alert = [[NSAlert alloc] init]
+  [alert setMessageText:msg]
+  [alert addButtonWithTitle:'OK']
+  [alert addButtonWithTitle:'Cancel']
+  [alert setAccessoryView:accessory]
+
+  var responseCode = [alert runModal]
+  var sel = [accessory indexOfSelectedItem]
+
+  return [responseCode, sel]
 }

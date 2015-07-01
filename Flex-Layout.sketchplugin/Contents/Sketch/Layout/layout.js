@@ -25,10 +25,35 @@ var onRun = function(context) {
   var computedTree = computeStyles(styleTree);
   log("computed layout tree:" + computedTree);
   var measuredStyleTree = collectMeasures(styleTree, computedTree);
-  log("measured style tree:");
-  log(measuredStyleTree);
   computedTree = computeStyles(measuredStyleTree);
   log("recomputed measured layout tree:" + computedTree);
   layoutElements(computedTree);
   layoutPrototypes();
+}
+
+var newObjectFromPrototype = function(context){
+  init(context);
+  var prototypeLayers = getPrototypeLayers();
+  var chosenPrototype;
+  // let people choose from more prototypes or select the single one
+  if (prototypeLayers.length == 0) {
+    showMessage("There appear to be no prototypes in this document")
+    return;
+  } else if (prototypeLayers.length == 1) {
+    chosenPrototype = prototypeLayers[0];
+  } else {
+    var prototypeNames = arrayOfValuesByKey(prototypeLayers,"name");
+    var dialogResult = createSelect("Choose a prototype",prototypeNames);
+    if (dialogResult[0] == NSAlertFirstButtonReturn) {
+      chosenIndex = dialogResult[1];
+      chosenPrototype = prototypeLayers[chosenIndex];
+    }
+  }
+  // duplicate and clean up the prototype instance
+  var newLayer = instantiatePrototype(chosenPrototype.layer);
+  // move it to selection if there is selection
+  if([selection count] != 0){
+    moveLayerToSelection(newLayer);
+    onRun(context);
+  }
 }

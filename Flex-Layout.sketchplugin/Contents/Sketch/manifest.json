@@ -15,10 +15,17 @@
       "shortcut" : "cmd ctrl l",
       "identifier" : "layoutElements"
     },
+    {
+      "name" : "Add Object from Prototype",
+      "script" : "Layout/layout.js",
+      "handler" : "newObjectFromPrototype",
+      "identifier" : "newObjectFromPrototype"
+    }
   ],
   "menu" : {
     "items" :[
-      "layoutElements"
+      "layoutElements",
+      "newObjectFromPrototype"
     ]
   }
 }

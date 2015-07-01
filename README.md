@@ -28,8 +28,8 @@ Flex Layout allows you to use both a stylesheet text layer and 'prototypes'. Pro
 2. Add rectangle style layers to the group - [these are the supported names and dimensions](http://i.imgur.com/IguIeFI.png)
 	- if you need it, add a text layer named **"@styles"** with layout styles, separated by semicolon - [these are the styles and values](http://i.imgur.com/oseZ1Dr.png)
 3. You can add more groups with their own styles to the prototype group, and these don't need the "prototype" in their name, just the **".somethingelse"** class name
-4. Duplicate the prototype, remove **"prototype"** from the layer name, remove all the style layers, and you have a group that will change based on changes made to the prototype
-5. Run cmd + ctrl + L for the layout to apply
+4. Run _Add Object From Prototype_ action - this will duplicate the prototype, remove all the style layers and if you have a group selected, it will move it under the group. This will also apply the layout.
+5. After you make changes, Run cmd + ctrl + L for the layout to apply.
 
 *Tip* - you can have both prototypes and a *@stylesheet* layer on the same page.
 

@@ -26,6 +26,32 @@ var layoutPrototypes  = function(){
     });
 }
 
+// creates a new object from the given prototype
+var instantiatePrototype = function(layer){
+  // remove prototype from layer
+  var newLayer = [layer duplicate];
+  [newLayer setName:getPrototypeClassFromLayer(newLayer)];
+
+  // rename size layers and collect style layers
+  var layersToDelete = [];
+  callOnChildLayers(newLayer, function(currentLayer){
+    if (isLayerAStyleLayer(currentLayer)) {
+      if (currentLayer.name() == styleHandle + "size") {
+        [currentLayer setName:backgroundLayerName];
+      } else {
+        layersToDelete.push(currentLayer);
+      }
+    }
+  });
+
+  // remove style layers
+  for (var i = 0; i < layersToDelete.length; i++) {
+    var layerToDelete = layersToDelete[i];
+    [layerToDelete removeFromParent];
+  }
+  return newLayer;
+}
+
 // recursively look for prototypes and collect styles in an array
 var parseLayersForPrototypes = function(baseLayer,shouldCollectStyles){
   //if layer is a prototype, flip a switch to parse all of the children for styles
@@ -61,6 +87,19 @@ var parseLayersForPrototypes = function(baseLayer,shouldCollectStyles){
 // returns whether a layer group is a prototype or not
 var isLayerAPrototype = function(layer){
   return [[layer name] hasPrefix:prototypeKeyword];
+}
+
+var isLayerAStyleLayer = function(layer){
+  var layerName = layer.name();
+  var allStyleLayers = compoundProperties.concat(widthProperties).concat(heightProperties);
+  allStyleLayers.push(styleLayerName);
+  for (var i = 0; i < allStyleLayers.length; i++) {
+    var styleName = styleHandle + allStyleLayers[i];
+    if (layerName == styleName) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // collects all attributes from style layers
@@ -146,4 +185,24 @@ var attributesFromStyleLayer = function(layer){
 // lays out and colors all the prototype style layers
 var layoutPrototypeStyles = function(layer){
   log("laying out " + layer.name());
+}
+
+// gets all prototype
+var getPrototypeLayers = function(){
+  var prototypes = [];
+  callOnChildLayers(page, function(layer){
+    if (isLayerAPrototype(layer)) {
+      var prototypeObj = {};
+      prototypeObj.name = getPrototypeClassFromLayer(layer);
+      prototypeObj.layer = layer;
+      prototypes.push(prototypeObj);
+    }
+  });
+  return prototypes;
+}
+
+var getPrototypeClassFromLayer = function(layer){
+  var prototypeClass = "";
+  var prototypePrefix = prototypeKeyword + " ";
+  return [[layer name] substringFromIndex:prototypePrefix.length];
 }
