@@ -183,7 +183,7 @@ utils.js = {
 // UI
 utils.UI = {
   showInput : function (message, initialValue){
-    var initial = "";
+    var initial = initialValue || "";
     return [doc askForUserInput:message initialValue:initial];
   },
   showMessage : function(message){
