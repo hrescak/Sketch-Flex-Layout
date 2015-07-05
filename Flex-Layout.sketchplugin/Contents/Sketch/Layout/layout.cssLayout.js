@@ -24,9 +24,9 @@ var collectMeasures = function(styleTree, computedStyleTree){
 var computeStyles = function(styleTree){
   //load css-layout
   var jsContext = [[JSContext alloc] init];
-  var layoutLib = getLibraryContents("lib/css-layout/Layout.js");
+  var layoutLib = utils.js.loadLibrary("lib/css-layout/Layout.js");
   [jsContext evaluateScript:layoutLib];
-  var layoutHelper = getLibraryContents("layout.JSLayoutHelper.js");
+  var layoutHelper = utils.js.loadLibrary("layout.JSLayoutHelper.js");
   [jsContext evaluateScript:layoutHelper];
   var computeLayout = jsContext[@"provideComputedLayout"];
 
@@ -39,7 +39,7 @@ var computeStyles = function(styleTree){
 
   //in case something goes to hell - todo - throw an alert if not empty
   if ([jsContext exception]) {
-    showError("CSS Layout: " + [jsContext exception]);
+    utils.UI.showError("CSS Layout: " + [jsContext exception]);
   };
   return [computedStyles toDictionary];
 }
@@ -77,7 +77,7 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
     currentLayer.setRect(positionRect);
 
     // don't set size on groups, it resizes based on children and would fuck things up
-    if (!isGroupClassMember(currentLayer)) {
+    if (!utils.is.group(currentLayer)) {
       var sizeRect = [currentLayer rect];
       sizeRect.size.width = layerTree["width"];
       sizeRect.size.height = layerTree["height"];
@@ -86,7 +86,7 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
   }
 
   // iterate over children recursively if we can
-  if (isGroupClassMember(currentLayer)){
+  if (utils.is.group(currentLayer)){
     var childLayers = [currentLayer layers].array();
     var childStyleTree = layerTree["children"];
     var parentX = currentLayer.frame.x;
@@ -121,7 +121,7 @@ var collectMeasuresRecursively = function(currentLayer, styleTree, computedStyle
     shouldCollectMeasures = true;
   }
   //collect measures if it's a text layer
-  if (shouldCollectMeasures && isTextLayer(currentLayer)) {
+  if (shouldCollectMeasures && utils.is.textLayer(currentLayer)) {
     // parent elements have width and text should behave appropriately
     if (computedStyleTree["width"] > 0) {
       [currentLayer setTextBehaviour:1] // BCTextBehaviourFixedWidth
@@ -138,7 +138,7 @@ var collectMeasuresRecursively = function(currentLayer, styleTree, computedStyle
   }
 
   // iterate over children recursively if we can
-  if (isGroupClassMember(currentLayer)){
+  if (utils.is.group(currentLayer)){
     var childLayers = [currentLayer layers].array();
     var childStyleTree = styleTree["children"];
     var childComputedTree = computedStyleTree["children"];
@@ -161,13 +161,13 @@ var saveAStyleToLayersRecursively = function(selector, style, layer){
   //save styles to layers with classes, ignore stylesheet layer and the parent page
   //for the future - ignore prototype layers maybe?
   if (layer.name() != styleSheetLayerName && layer.class() != "MSPage"){
-    if (endsWithString(layer.name(), selector)) {
+    if (utils.common.endsWithString(layer.name(), selector)) {
       [pluginCommand setValue:style.attributes forKey:"style" onLayer:layer];
     }
   }
 
   // iterate over children recursively if we can
-  if (isGroupClassMember(layer)){
+  if (utils.is.group(layer)){
     var childLayers = [layer layers].array();
     if (childLayers){
       var loop = [childLayers objectEnumerator];
@@ -184,7 +184,7 @@ var flushLayerStylesRecursively = function(layer){
   [pluginCommand setValue:nil forKey:"computedHeight" onLayer:layer];
 
   // iterate over children recursively if we can
-  if (isGroupClassMember(layer)){
+  if (utils.is.group(layer)){
     var childLayers = [layer layers].array();
     if (childLayers){
       var loop = [childLayers objectEnumerator];
@@ -214,7 +214,7 @@ var stylesForAllLayers = function(layer){
   }
 
   // iterate over children recursively if we can
-  if (isGroupClassMember(layer)){
+  if (utils.is.group(layer)){
     var childLayers = [layer layers].array();
     if (childLayers){
       var childrenArray = [];

@@ -28,9 +28,9 @@ var getStyleSheetLayer = function(layerName){
 // takes a CSS string and returns a json with all the rules
 var parseCss = function(cssToParse) {
   var jsContext = [[JSContext alloc] init];
-  var jsonLib = getLibraryContents("lib/CSSJSON/json2.js");
+  var jsonLib = utils.js.loadLibrary("lib/CSSJSON/json2.js");
   [jsContext evaluateScript:jsonLib];
-  var parser = getLibraryContents("lib/CSSJSON/cssjson.js");
+  var parser = utils.js.loadLibrary("lib/CSSJSON/cssjson.js");
   [jsContext evaluateScript:parser];
   var parseScript = jsContext[@"CSSJSON"][@"toJSON"];
   var parseArguments = NSArray.arrayWithObjects(cssToParse);

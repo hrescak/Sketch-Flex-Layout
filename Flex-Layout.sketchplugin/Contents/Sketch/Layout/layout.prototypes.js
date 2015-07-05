@@ -9,17 +9,17 @@ var heightProperties = ["height", "minHeight", "maxHeight", "top", "bottom", "ma
 var parsePrototypes = function(){
   // look for prototypes in page recursively
   var styleArray = parseLayersForPrototypes(page,false);
-  var flattenedArray = flattenArray(styleArray);
+  var flattenedArray = utils.common.flattenArray(styleArray);
   log(flattenedArray.length + " classes found in prototypes");
-  var styleObject = keyedObjectFromArray(flattenedArray, "class");
+  var styleObject = utils.common.keyedObjectFromArray(flattenedArray, "class");
   return styleObject;
 }
 
 // lays out prototype styles
 var layoutPrototypes  = function(){
-    callOnChildLayers(page, function(layer){
+    utils.call.pageLayers(function(layer){
       if (isLayerAPrototype(layer)) {
-        callOnChildLayers(layer, function(currentLayer){
+        utils.call.childLayers(layer, function(currentLayer){
           layoutPrototypeStyles(currentLayer);
         })
       };
@@ -34,7 +34,7 @@ var instantiatePrototype = function(layer){
 
   // rename size layers and collect style layers
   var layersToDelete = [];
-  callOnChildLayers(newLayer, function(currentLayer){
+  utils.call.childLayers(newLayer, function(currentLayer){
     if (isLayerAStyleLayer(currentLayer)) {
       if (currentLayer.name() == styleHandle + "size") {
         [currentLayer setName:backgroundLayerName];
@@ -60,16 +60,16 @@ var parseLayersForPrototypes = function(baseLayer,shouldCollectStyles){
     shouldCollectStyles = true;
   }
   // you can only collect styles on groups
-  if (isGroupClassMember(baseLayer)){
+  if (utils.is.group(baseLayer)){
     if (shouldCollectStyles) {
       var styleAttributes = collectAttributes(baseLayer);
-      if (objectSize(styleAttributes) > 0) {
+      if (utils.common.objectSize(styleAttributes) > 0) {
         var styleObject = {};
-        styleObject["class"] = layerClass(baseLayer);
+        styleObject["class"] = getClassFromLayer(baseLayer);
         styleObject["attributes"] = styleAttributes;
         parsedStyles.push(styleObject);
       } else {
-        showMessage(baseLayer.name() + " has no styles attached");
+        utils.UI.showMessage(baseLayer.name() + " has no styles attached");
       }
     }
     var childLayers = [baseLayer layers].array();
@@ -89,6 +89,7 @@ var isLayerAPrototype = function(layer){
   return [[layer name] hasPrefix:prototypeKeyword];
 }
 
+// returns whether a layer is one of the style layers within a prototype
 var isLayerAStyleLayer = function(layer){
   var layerName = layer.name();
   var allStyleLayers = compoundProperties.concat(widthProperties).concat(heightProperties);
@@ -162,7 +163,7 @@ var collectAttributes = function(layer){
 //collects attribute from the styles text layer
 var attributesFromStyleLayer = function(layer){
   var attributes = {};
-  if (isTextLayer(layer)) {
+  if (utils.is.textLayer(layer)) {
     var attributeString = [layer stringValue];
     //strip whitespace and newlines
     attributeString = [attributeString stringByReplacingOccurrencesOfString:"\n" withString:""];
@@ -184,13 +185,18 @@ var attributesFromStyleLayer = function(layer){
 
 // lays out and colors all the prototype style layers
 var layoutPrototypeStyles = function(layer){
-  log("laying out " + layer.name());
+  var dimensionOffset = 4; // how far are the width layers offset from prototype
+  var parentLayer = [layer parentGroup];
+  var stylesCenterVertically = ["paddingTop", "paddingBottom", "marginTop", "marginBottom", "width", "minWidth", "maxWidth"];
+  var stylesCenterHorizontally = ["paddingLeft", "paddingRight", "marginLeft", "marginRight", "height", "minHeight", "maxHeight"];
+
+  //TODO figure out a way to read the computed style, probably by saving the rect in 'computedStyle' valueforkey
 }
 
 // gets all prototype
 var getPrototypeLayers = function(){
   var prototypes = [];
-  callOnChildLayers(page, function(layer){
+  utils.call.pageLayers(function(layer){
     if (isLayerAPrototype(layer)) {
       var prototypeObj = {};
       prototypeObj.name = getPrototypeClassFromLayer(layer);
@@ -201,8 +207,14 @@ var getPrototypeLayers = function(){
   return prototypes;
 }
 
+// returns prototype class
 var getPrototypeClassFromLayer = function(layer){
   var prototypeClass = "";
   var prototypePrefix = prototypeKeyword + " ";
   return [[layer name] substringFromIndex:prototypePrefix.length];
+}
+
+// returns layer class
+var getClassFromLayer = function(layer){
+  return "." + [[[layer name] componentsSeparatedByString:"."] lastObject];
 }

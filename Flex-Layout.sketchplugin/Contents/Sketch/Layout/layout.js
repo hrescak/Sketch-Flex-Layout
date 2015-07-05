@@ -4,7 +4,7 @@
 // Apply CSS Layout to Sketch elements
 // Matej Hrescak (matejh@fb.com)
 
-@import 'layout.utils.js'
+@import 'utils.js'
 @import 'layout.cssParser.js'
 @import 'layout.prototypes.js'
 @import 'layout.cssLayout.js'
@@ -13,37 +13,56 @@ var styleSheetLayerName = "@stylesheet";
 var backgroundLayerName = "bg";
 
 var onRun = function(context) {
-  init(context);
+  utils.init(context);
+  //debug.start();
+  // parsing prototypes
   var parsedSheet = parseStyleSheetLayer();
   var prototypeSheet = parsePrototypes();
   for(var attr in prototypeSheet){ parsedSheet[attr] = prototypeSheet[attr]};
-  log("stylesheet with prototypes:" + parsedSheet);
+  debug.logPart("Stylesheet + prototypes parsed");
+  //log(parsedSheet);
+
+  // saving and reading from layers
   saveStylesToLayers(parsedSheet);
   var styleTree = styleTreeFromLayers();
-  log("style tree from layers:");
-  log(styleTree);
+  debug.logPart("Layer metadata I/O");
+  //log(styleTree);
+
+  // compute layout
   var computedTree = computeStyles(styleTree);
-  log("computed layout tree:" + computedTree);
+  debug.logPart("Computed styles");
+  //log(computedTree);
+
+  // measure text layers
   var measuredStyleTree = collectMeasures(styleTree, computedTree);
+  debug.logPart("Measures collected");
+  //log(measuredStyleTree);
+
+  // recompute the tree again
   computedTree = computeStyles(measuredStyleTree);
-  log("recomputed measured layout tree:" + computedTree);
+  debug.logPart("Recomputed styles");
+  //log(computedTree);
+
+  // lay out the elements
   layoutElements(computedTree);
   layoutPrototypes();
+  debug.logPart("Layer layout styles");
+  debug.end();
 }
 
 var newObjectFromPrototype = function(context){
-  init(context);
+  utils.init(context);
   var prototypeLayers = getPrototypeLayers();
   var chosenPrototype;
   // let people choose from more prototypes or select the single one
   if (prototypeLayers.length == 0) {
-    showMessage("There appear to be no prototypes in this document")
+    utils.UI.showMessage("There appear to be no prototypes in this document")
     return;
   } else if (prototypeLayers.length == 1) {
     chosenPrototype = prototypeLayers[0];
   } else {
-    var prototypeNames = arrayOfValuesByKey(prototypeLayers,"name");
-    var dialogResult = createSelect("Choose a prototype",prototypeNames);
+    var prototypeNames = utils.common.arrayOfValuesByKey(prototypeLayers,"name");
+    var dialogResult = utils.UI.showSelect("Choose a prototype",prototypeNames);
     if (dialogResult[0] == NSAlertFirstButtonReturn) {
       chosenIndex = dialogResult[1];
       chosenPrototype = prototypeLayers[chosenIndex];
@@ -53,7 +72,10 @@ var newObjectFromPrototype = function(context){
   var newLayer = instantiatePrototype(chosenPrototype.layer);
   // move it to selection if there is selection
   if([selection count] != 0){
-    moveLayerToSelection(newLayer);
+    utils.misc.moveLayerToSelection(newLayer);
     onRun(context);
+  } else {
+    // otherwise select the newly created layer
+    [newLayer select:true byExpandingSelection:false];
   }
 }
