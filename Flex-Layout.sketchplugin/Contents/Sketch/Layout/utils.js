@@ -113,6 +113,10 @@ utils.common = {
   endsWithString : function(str, suffix){
     return [str hasSuffix:suffix];
   },
+  // returns whether a string starts with a prefix
+  startsWithString : function(str, prefix){
+    return [str hasPrefix:prefix];
+  },
   // returns javascript object size
   objectSize : function(obj){
     return Object.keys(obj).length;
@@ -162,7 +166,7 @@ utils.misc = {
       [selectedLayer addLayers:[layer]];
     }
   }
-}
+};
 
 // interaction with a separate javascript context
 utils.js = {
@@ -172,17 +176,15 @@ utils.js = {
     var fileString = NSString.stringWithContentsOfFile(libraryURL);
     return fileString;
   }
-}
+};
 
 // ------------ UI --------- //
 
 // UI
 utils.UI = {
   showInput : function (message, initialValue){
-    if (!initialValue) {
-      initialValue = "";
-    }
-    return [doc askForUserInput:message initialValue:initialValue];
+    var initial = "";
+    return [doc askForUserInput:message initialValue:initial];
   },
   showMessage : function(message){
     [doc showMessage:message];
