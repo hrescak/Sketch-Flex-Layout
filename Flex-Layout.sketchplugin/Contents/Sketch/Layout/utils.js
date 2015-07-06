@@ -92,14 +92,14 @@ utils.call = {
 utils.is = {
   // returns whether a layer is a group
   group : function(layer){
-    if ([layer class] == "MSArtboardGroup" || [layer class] == "MSLayerGroup" || [layer class] == "MSPage"]) {
+    if ([layer isKindOfClass:MSLayerGroup] && ![layer isMemberOfClass:MSShapeGroup]) {
       return true;
     }
     return false;
   },
   // returns whether a layer is a text layer
   textLayer : function(layer){
-    return ([layer class] == "MSTextLayer");
+    return ([layer isMemberOfClass:MSTextLayer]);
   },
   // returns whether nothing is selected
   selectionEmpty : function(){
