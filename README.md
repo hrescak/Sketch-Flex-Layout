@@ -11,14 +11,14 @@ Flex Layout allows you to use both a stylesheet text layer and 'prototypes'. Pro
 
 1. Create a text layer and name it **“@stylesheet”**.
 2. Write css in the layer. Some rules:
-	1. the supported properties are listed [here](https://github.com/facebook/css-layout).
-	2. they are in camelCase not hyphen-ated
-	3. they have no units
-	4. shortcut rules are not supported (yet)
-	5. there are only classes *(.something)*
-	6. so no nested styles *(“\>” declarations)*
+	- the supported properties are listed [here](https://github.com/facebook/css-layout).
+	- they are in camelCase not hyphen-ated
+	- they have no units
+	- shortcut rules are not supported (yet)
+	- there are only classes *(.something)*
+	- so no nested styles *(“\>” declarations)*
 3. Create some layers and append the selectors to them. So if your selector is '.someclass{width:200;}', you rename the layer from 'Rect1' to 'Rect1 .someclass'
-4. Run cmd + ctrl + L for the layout to apply
+4. Run cmd + ctrl + L for the layout to apply _(make sure your stylesheet layer is de-selected, or the changes will not apply)_
 
 ## Working with prototypes
 
