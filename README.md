@@ -1,5 +1,5 @@
 # Sketch Flex Layout
-A Plugin for Sketch allowing for CSS Flexbox layouts using stylesheets and prototypes. To install the plugin download this repository as a ZIP and double click the Flex-Layout.sketchplugin file. **Important note :** *This is a very work in progress version for early testing. A lot of things are subject to change and using it on critical projects is not yet recommended.*
+A Plugin for Sketch allowing for CSS Flexbox layouts using stylesheets and prototypes. Here's a [Medium article](https://medium.com/@hrescak/exploring-dynamic-layout-in-sketch-fdf0e825d1cf) with some background. To install the plugin download this repository as a ZIP and double click the Flex-Layout.sketchplugin file. **Important note :** *This is a very work in progress version for early testing. A lot of things are subject to change and using it on critical projects is not yet recommended.*
 
 ![](http://i.imgur.com/Z5A8Hqo.png)
 
@@ -24,14 +24,16 @@ Flex Layout allows you to use both a stylesheet text layer and 'prototypes'. Pro
 
 ![](http://i.imgur.com/Y86vIYJ.png)
 
-1. Create a prototype group, name it **"prototype .SOMETHING"**
-2. Add rectangle style layers to the group - [these are the supported names and dimensions](http://i.imgur.com/IguIeFI.png)
+1. Create a layer group, name it **"prototype .SOMETHING"**
+2. Add rectangles to the group that will define its style - [these are the supported names and dimensions](http://i.imgur.com/IguIeFI.png)
 	- if you need it, add a text layer named **"@styles"** with layout styles, separated by semicolon - [these are the styles and values](http://i.imgur.com/oseZ1Dr.png)
 3. You can add more groups with their own styles to the prototype group, and these don't need the "prototype" in their name, just the **".somethingelse"** class name
 4. Run _Add Object From Prototype_ action - this will duplicate the prototype, remove all the style layers and if you have a group selected, it will move it under the group. This will also apply the layout.
 5. After you make changes, Run cmd + ctrl + L for the layout to apply.
 
-*Tip* - you can have both prototypes and a *@stylesheet* layer on the same page.
+**Tip** - you can have both prototypes and a *@stylesheet* layer on the same page.
+
+**Pro Tip** - when you duplicate your groups, you can prevent Sketch from adding "copy" to their names - Go to Preferences > Layers > Uncheck "Rename Duplicated Layers"
 
 ## Notes
 
@@ -42,4 +44,4 @@ Flex Layout allows you to use both a stylesheet text layer and 'prototypes'. Pro
 
 ## Todos / Known problems
 
-- See Issues to the right.
+- See [Issues](/issues) to the right.
