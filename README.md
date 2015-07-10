@@ -44,4 +44,4 @@ Flex Layout allows you to use both a stylesheet text layer and 'prototypes'. Pro
 
 ## Todos / Known problems
 
-- See [Issues](/issues) to the right.
+- See [Issues](https://github.com/hrescak/Sketch-Flex-Layout/issues) to the right.
