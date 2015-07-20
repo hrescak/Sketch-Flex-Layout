@@ -22,11 +22,10 @@ var onRun = function(context) {
   debug.logPart("Stylesheet + prototypes parsed");
   //log(parsedSheet);
 
-  // saving and reading from layers
-  saveStylesToLayers(parsedSheet);
-  var styleTree = styleTreeFromLayers();
-  debug.logPart("Layer metadata I/O");
-  //log(styleTree);
+  // apply stylesheet to layers and return layer tree with styles
+  var styleTree = layerTreeWithStyles(parsedSheet);
+  debug.logPart("Applying stylesheet to layers")
+  //log(styleTree)
 
   // compute layout
   var computedTree = computeStyles(styleTree);

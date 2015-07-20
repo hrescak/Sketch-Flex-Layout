@@ -1,20 +1,11 @@
 
-
-// save stylesheet to layer metadata
-var saveStylesToLayers = function(styles){
-  flushLayerStylesRecursively(page);
-  for (var selector in styles) {
-    saveAStyleToLayersRecursively(selector,styles[selector],page);
-  }
+// apply a given stylesheet to classes and return the layer style tree
+var layerTreeWithStyles = function(stylesheet){
+  var layerTree = layerTreeWithStylesheet(stylesheet, page);
+  return layerTree;
 }
 
-//read styles from layer metadata
-var styleTreeFromLayers = function(){
-  var styleTree = stylesForAllLayers(page);
-  return styleTree;
-}
-
-//collect all the measures from layers
+// collect all the measures from layers
 var collectMeasures = function(styleTree, computedStyleTree){
   var measuredStyleTree = collectMeasuresRecursively(page, styleTree, computedStyleTree, false);
   return measuredStyleTree;
@@ -154,62 +145,32 @@ var collectMeasuresRecursively = function(currentLayer, styleTree, computedStyle
 
 // ----------------- helpers ---------------- //
 
-// takes a selector, traverses the layer to see if there's one with that name
-// and saves a corresponding style to the layer metadata
-var saveAStyleToLayersRecursively = function(selector, style, layer){
-
-  //save styles to layers with classes, ignore stylesheet layer and the parent page
-  //for the future - ignore prototype layers maybe?
-  if (layer.name() != styleSheetLayerName && layer.class() != "MSPage"){
-    if (utils.common.endsWithString(layer.name(), selector)) {
-      [pluginCommand setValue:style.attributes forKey:"style" onLayer:layer];
-    }
-  }
-
-  // iterate over children recursively if we can
-  if (utils.is.group(layer)){
-    var childLayers = [layer layers].array();
-    if (childLayers){
-      var loop = [childLayers objectEnumerator];
-       while (item = [loop nextObject]) {
-         saveAStyleToLayersRecursively(selector, style, item);
-      }
-    }
-  }
-}
-
-var flushLayerStylesRecursively = function(layer){
-  [pluginCommand setValue:nil forKey:"style" onLayer:layer];
-  [pluginCommand setValue:nil forKey:"computedWidth" onLayer:layer];
-  [pluginCommand setValue:nil forKey:"computedHeight" onLayer:layer];
-
-  // iterate over children recursively if we can
-  if (utils.is.group(layer)){
-    var childLayers = [layer layers].array();
-    if (childLayers){
-      var loop = [childLayers objectEnumerator];
-       while (item = [loop nextObject]) {
-         flushLayerStylesRecursively(item);
-      }
-    }
-  }
-}
-
-// get the whole tree of layers with styles saved in the layer metadata
-var stylesForAllLayers = function(layer){
+// takes a stylesheet, returns a tree of layers with the individual selector
+// styles applied to layers that match the selector, also applies
+// absolute styles for backgrounds and style layers so they're not moved
+var layerTreeWithStylesheet = function(stylesheet, layer){
   var layerInfo = {};
-  if (layer.name() != styleSheetLayerName){
-    layerInfo["name"] = layer.name(); //todo - find a way to represent layer better (uuid that gets stored maybe?)
-    var layerStyle = [pluginCommand valueForKey:"style" onLayer:layer];
-    if (layerStyle) {
-      layerInfo["style"] = layerStyle;
-    }
+  // ignore stylesheets
+  var layerName = layer.name();
+  if (layerName == styleSheetLayerName || utils.is.page(layer)) {
 
-    //add position absolute to style layers and backgrounds so their sizes are not computed
-    if ([[layer name] hasPrefix:"@"] || [layer name] == backgroundLayerName){
-      layerStyle = {};
-      layerStyle["position"] = "absolute";
-      layerInfo["style"] = layerStyle;
+    // ignore stylesheets and pages
+
+  } else if ([layerName hasPrefix:"@"] || layerName == backgroundLayerName){
+
+    // add position absolute to style layers and backgrounds so their sizes are not computed
+    layerStyle = {};
+    layerStyle["position"] = "absolute";
+    layerInfo["style"] = layerStyle;
+
+  } else {
+
+    // check if we should style this layer and add it to the style
+    for (var selector in stylesheet) {
+      if (utils.common.endsWithString(layerName, selector)) {
+        var style = stylesheet[selector];
+        layerInfo["style"] = style.attributes;
+      }
     }
   }
 
@@ -220,7 +181,7 @@ var stylesForAllLayers = function(layer){
       var childrenArray = [];
       var loop = [childLayers objectEnumerator];
       while (item = [loop nextObject]) {
-         var childLayerInfo = stylesForAllLayers(item);
+         var childLayerInfo = layerTreeWithStylesheet(stylesheet, item);
          //todo - in case stylesheet is somewhere deep we should remove this
          childrenArray.push(childLayerInfo);
       }

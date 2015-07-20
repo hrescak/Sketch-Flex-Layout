@@ -97,6 +97,9 @@ utils.is = {
     }
     return false;
   },
+  page : function(layer){
+    return ([layer isMemberOfClass:MSPage]);
+  },
   // returns whether a layer is a text layer
   textLayer : function(layer){
     return ([layer isMemberOfClass:MSTextLayer]);
