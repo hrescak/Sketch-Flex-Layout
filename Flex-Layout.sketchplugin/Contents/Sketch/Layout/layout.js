@@ -14,7 +14,7 @@ var backgroundLayerName = "bg";
 
 var onRun = function(context) {
   utils.init(context);
-  //debug.start();
+  debug.start();
   // parsing prototypes
   var parsedSheet = parseStyleSheetLayer();
   var prototypeSheet = parsePrototypes();
@@ -43,7 +43,7 @@ var onRun = function(context) {
   //log(computedTree);
 
   // lay out the elements
-  layoutElements(computedTree);
+  layoutElements(styleTree, computedTree);
   layoutPrototypes();
   debug.logPart("Layer layout styles");
   debug.end();

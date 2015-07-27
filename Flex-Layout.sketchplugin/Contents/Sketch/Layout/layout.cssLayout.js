@@ -36,19 +36,19 @@ var computeStyles = function(styleTree){
 }
 
 // lay out all the layers given computed styles
-var layoutElements = function(computedTree){
-  layoutLayersRecursively(computedTree, 0,0, page, false);
+var layoutElements = function(styleTree, computedTree){
+  layoutLayersRecursively(styleTree, computedTree, 0,0, page, false);
   doc.currentView().refresh();
 }
 
 // traverse all of the layers and lay out the elements
-var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLayer, layoutChildrenFlag)
+var layoutLayersRecursively = function(styleTree, computedTree, currentX, currentY, currentLayer, layoutChildrenFlag)
 {
   var shouldLayoutChildren = layoutChildrenFlag;
   // check if the item has a style attribute and if yes, turn the flag on
   // to lay out itself and all of it's children. This is to only start laying out
   // from the topmost item in the hierarchy that has a style attribute.
-  if ([pluginCommand valueForKey:"style" onLayer:currentLayer]) {
+  if (styleTree.hasOwnProperty("style")) {
     shouldLayoutChildren = true;
   }
   //ignore top page and stylesheet layer
@@ -59,8 +59,8 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
     if (!currentY) { currentY = 0; };
     if (!currentX) { currentX = 0; };
 
-    var relativeY = currentY + layerTree["top"];
-    var relativeX = currentX + layerTree["left"];
+    var relativeY = currentY + computedTree["top"];
+    var relativeX = currentX + computedTree["left"];
 
     var positionRect = currentLayer.rect();
     positionRect.origin.x = relativeX;
@@ -70,8 +70,8 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
     // don't set size on groups, it resizes based on children and would fuck things up
     if (!utils.is.group(currentLayer)) {
       var sizeRect = [currentLayer rect];
-      sizeRect.size.width = layerTree["width"];
-      sizeRect.size.height = layerTree["height"];
+      sizeRect.size.width = computedTree["width"];
+      sizeRect.size.height = computedTree["height"];
       [currentLayer setRect:sizeRect];
     }
   }
@@ -79,7 +79,8 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
   // iterate over children recursively if we can
   if (utils.is.group(currentLayer)){
     var childLayers = [currentLayer layers].array();
-    var childStyleTree = layerTree["children"];
+    var childComputedTree = computedTree["children"];
+    var childStyleTree = styleTree["children"];
     var parentX = currentLayer.frame.x;
     var parentY = currentLayer.frame.y;
     if (childLayers){
@@ -91,11 +92,11 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
           var childRect = [childLayer rect];
           childRect.origin.y = 0;
           childRect.origin.x = 0;
-          childRect.size.width = layerTree["width"];
-          childRect.size.height = layerTree["height"];
+          childRect.size.width = computedTree["width"];
+          childRect.size.height = computedTree["height"];
           [childLayer setRect:childRect];
         }
-        layoutLayersRecursively(childStyleTree[i], parentX, parentY, childLayer, shouldLayoutChildren);
+        layoutLayersRecursively(childStyleTree[i], childComputedTree[i], parentX, parentY, childLayer, shouldLayoutChildren);
       }
       // make sure group's bounds are re-set
       [currentLayer resizeRoot:true];
@@ -108,7 +109,7 @@ var layoutLayersRecursively = function(layerTree, currentX, currentY, currentLay
 // and add it back to the style tree
 var collectMeasuresRecursively = function(currentLayer, styleTree, computedStyleTree, shouldCollectMeasures){
   // only collect measures if it's a descendant of a styled element
-  if ([pluginCommand valueForKey:"style" onLayer:currentLayer]) {
+  if (styleTree.hasOwnProperty("style")) {
     shouldCollectMeasures = true;
   }
   //collect measures if it's a text layer
@@ -152,6 +153,7 @@ var layerTreeWithStylesheet = function(stylesheet, layer){
   var layerInfo = {};
   // ignore stylesheets
   var layerName = layer.name();
+  layerInfo["name"] = layerName;
   if (layerName == styleSheetLayerName || utils.is.page(layer)) {
 
     // ignore stylesheets and pages
