@@ -51,6 +51,11 @@ var layoutLayersRecursively = function(styleTree, computedTree, currentX, curren
   if (styleTree.hasOwnProperty("style")) {
     shouldLayoutChildren = true;
   }
+
+  // don't lay out children of layers that start with "@"
+  if (shouldIgnoreLayer(currentLayer)) {
+    shouldLayoutChildren = false;
+  }
   //ignore top page and stylesheet layer
   //todo - handle artboards better
   if (shouldLayoutChildren && !shouldIgnoreLayer(currentLayer)) {
