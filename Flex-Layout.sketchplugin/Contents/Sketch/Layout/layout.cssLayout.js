@@ -104,7 +104,7 @@ var layoutLayersRecursively = function(styleTree, computedTree, currentX, curren
         layoutLayersRecursively(childStyleTree[i], childComputedTree[i], parentX, parentY, childLayer, shouldLayoutChildren);
       }
       // make sure group's bounds are re-set
-      [currentLayer resizeRoot:true];
+      [currentLayer resizeToFitChildrenWithOption:1];
     }
   }
 }
