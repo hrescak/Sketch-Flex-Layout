@@ -38,7 +38,6 @@ var computeStyles = function(styleTree){
 // lay out all the layers given computed styles
 var layoutElements = function(styleTree, computedTree){
   layoutLayersRecursively(styleTree, computedTree, 0,0, page, false);
-  doc.currentView().refresh();
 }
 
 // traverse all of the layers and lay out the elements
@@ -83,7 +82,7 @@ var layoutLayersRecursively = function(styleTree, computedTree, currentX, curren
 
   // iterate over children recursively if we can
   if (utils.is.group(currentLayer)){
-    var childLayers = [currentLayer layers].array();
+    var childLayers = [currentLayer layers];
     var childComputedTree = computedTree["children"];
     var childStyleTree = styleTree["children"];
     var parentX = currentLayer.frame.x;
@@ -104,7 +103,7 @@ var layoutLayersRecursively = function(styleTree, computedTree, currentX, curren
         layoutLayersRecursively(childStyleTree[i], childComputedTree[i], parentX, parentY, childLayer, shouldLayoutChildren);
       }
       // make sure group's bounds are re-set
-      [currentLayer resizeRoot:true];
+      [currentLayer resizeToFitChildrenWithOption:1];
     }
   }
 }
@@ -136,7 +135,7 @@ var collectMeasuresRecursively = function(currentLayer, styleTree, computedStyle
 
   // iterate over children recursively if we can
   if (utils.is.group(currentLayer)){
-    var childLayers = [currentLayer layers].array();
+    var childLayers = [currentLayer layers];
     var childStyleTree = styleTree["children"];
     var childComputedTree = computedStyleTree["children"];
     if (childLayers){
@@ -183,7 +182,7 @@ var layerTreeWithStylesheet = function(stylesheet, layer){
 
   // iterate over children recursively if we can
   if (utils.is.group(layer)){
-    var childLayers = [layer layers].array();
+    var childLayers = [layer layers];
     if (childLayers){
       var childrenArray = [];
       var loop = [childLayers objectEnumerator];

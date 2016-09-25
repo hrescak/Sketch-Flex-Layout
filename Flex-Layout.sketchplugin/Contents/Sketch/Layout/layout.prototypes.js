@@ -72,7 +72,7 @@ var parseLayersForPrototypes = function(baseLayer,shouldCollectStyles){
         utils.UI.showMessage(baseLayer.name() + " has no styles attached");
       }
     }
-    var childLayers = [baseLayer layers].array();
+    var childLayers = [baseLayer layers];
     if (childLayers){
       for (var i=0; i < [childLayers count]; i++){
         var item = childLayers[i];
@@ -108,7 +108,7 @@ var collectAttributes = function(layer){
   var attributes = {};
 
   // iterate over child layers to look for style layers
-  var childLayers = [layer layers].array();
+  var childLayers = [layer layers];
 
   for (var i = 0; i < [childLayers count]; i++) {
     var styleLayer = childLayers[i];
