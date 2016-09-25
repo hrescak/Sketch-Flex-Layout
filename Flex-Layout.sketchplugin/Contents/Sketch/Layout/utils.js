@@ -63,7 +63,7 @@ utils.call = {
   childLayers : function(layer, callback){
     callback(layer);
     if (utils.is.group(layer)) {
-      var childLayers = [layer layers].array();
+      var childLayers = [layer layers];
       if (childLayers) {
         for (var i = 0; i < childLayers.count(); i++) {
           utils.call.childLayers(childLayers[i], callback);

@@ -14,7 +14,7 @@ var parseStyleSheetLayer = function() {
 // get the styleSheet layer
 var getStyleSheetLayer = function(layerName){
   var layer = nil;
-  var pageLayers = [page layers].array();
+  var pageLayers = [page layers];
   if (pageLayers) {
     var loop = [pageLayers objectEnumerator];
        while (item = [loop nextObject]) {
