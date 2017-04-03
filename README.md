@@ -8,6 +8,7 @@ Flex Layout allows you to use both a stylesheet text layer and 'prototypes'. Pro
 ## Install with Sketch Runner
 With Sketch Runner, just go to the `install` command and search for `Sketch Flex Layout`. Runner allows you to manage plugins and do much more to speed up your workflow in Sketch. [Download Runner here](http://www.sketchrunner.com).
 
+![Install with Sketch Runner](sketch-flex-layout-runner.png)
 
 ## Working with stylesheets
 
