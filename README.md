@@ -5,6 +5,11 @@ A Plugin for Sketch allowing for CSS Flexbox layouts using stylesheets and proto
 
 Flex Layout allows you to use both a stylesheet text layer and 'prototypes'. Prototypes are layer groups with added style layers - their sizes work as base for establishing paddings, margins, sizes etc. There's an [example file](https://github.com/hrescak/Sketch-Flex-Layout/raw/master/ExampleFile.sketch) included in the repository that shows examples of working with both.
 
+## Install with Sketch Runner
+With Sketch Runner, just go to the `install` command and search for `Sketch Flex Layout`. Runner allows you to manage plugins and do much more to speed up your workflow in Sketch. [Download Runner here](http://www.sketchrunner.com).
+
+![Install with Sketch Runner](sketch-flex-layout-runner.png)
+
 ## Working with stylesheets
 
 ![](http://i.imgur.com/2FcoADp.png)
